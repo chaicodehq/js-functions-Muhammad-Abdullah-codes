@@ -49,5 +49,56 @@
  *   // => { name: "Ram", area: "Dadar", total: 2, completed: 1, pending: 1, successRate: "50.00%" }
  */
 export function createDabbawala(name, area) {
-  // Your code here
+  let deliveries = [];
+  let nextId = 1;
+
+  return {
+    addDelivery: (from, to) => {
+      if (!from || !to || typeof from !== "string" || typeof to !== "string") {
+        return -1;
+      }
+      const id = nextId++;
+      deliveries.push({ id, from, to, status: "pending" });
+      return id;
+    },
+
+    completeDelivery: (id) => {
+      const delivery = deliveries.find((d) => d.id === id);
+      if (delivery && delivery.status === "pending") {
+        delivery.status = "completed";
+        return true;
+      }
+      return false;
+    },
+
+    getActiveDeliveries: () => {
+      return deliveries
+        .filter((d) => d.status === "pending")
+        .map((d) => ({ ...d }));
+    },
+
+    getStats: () => {
+      const total = deliveries.length;
+      const completed = deliveries.filter(
+        (d) => d.status === "completed",
+      ).length;
+      const pending = total - completed;
+      const rate = total === 0 ? 0 : (completed / total) * 100;
+
+      return {
+        name,
+        area,
+        total,
+        completed,
+        pending,
+        successRate: rate.toFixed(2) + "%",
+      };
+    },
+
+    reset: () => {
+      deliveries = [];
+      nextId = 1;
+      return true;
+    },
+  };
 }

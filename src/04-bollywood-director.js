@@ -45,13 +45,48 @@
  *   pricer("gold", true)  // => 200 * 1.5 * 1.3 = 390
  */
 export function createDialogueWriter(genre) {
-  // Your code here
+  const templates = {
+    action: (h, v) => `${h} says: 'Tujhe toh main dekh lunga, ${v}!'`,
+    romance: (h, v) => `${h} whispers: '${v}, tum mere liye sab kuch ho'`,
+    comedy: (h, v) => `${h} laughs: '${v} bhai, kya kar rahe ho yaar!'`,
+    drama: (h, v) => `${h} cries: '${v}, tune mera sab kuch cheen liya!'`,
+  };
+
+  if (!templates[genre]) return null;
+
+  return (hero, villain) => {
+    if (!hero || !villain) return "...";
+    return templates[genre](hero, villain);
+  };
 }
 
 export function createTicketPricer(basePrice) {
-  // Your code here
+  if (typeof basePrice !== "number" || basePrice <= 0) return null;
+
+  const multipliers = { silver: 1, gold: 1.5, platinum: 2 };
+
+  return (seatType, isWeekend = false) => {
+    const seatMult = multipliers[seatType];
+    if (seatMult === undefined) return null;
+
+    let price = basePrice * seatMult;
+    if (isWeekend) price *= 1.3;
+
+    return Math.round(price);
+  };
 }
 
 export function createRatingCalculator(weights) {
-  // Your code here
+  if (!weights || typeof weights !== "object" || Array.isArray(weights))
+    return null;
+
+  return (scores) => {
+    let total = 0;
+    for (let key in weights) {
+      if (scores[key] !== undefined) {
+        total += scores[key] * weights[key];
+      }
+    }
+    return parseFloat(total.toFixed(1));
+  };
 }
